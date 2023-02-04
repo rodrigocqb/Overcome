@@ -1,0 +1,6 @@
+[submodule "Overcome-Front"]
+	path = Overcome-Front
+	url = https://github.com/rodrigocqb/Overcome-Front
+[submodule "Overcome-Back"]
+	path = Overcome-Back
+	url = https://github.com/rodrigocqb/Overcome-Back

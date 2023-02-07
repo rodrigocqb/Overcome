@@ -30,6 +30,8 @@ Overcome is a mental health focused fitness application. Below are the implement
 - Delete older journals
 - Create new journals
 
+<br>
+
 ## Technologies
 The following tools and frameworks were used in the construction of this application:
 ### Front-End
@@ -63,6 +65,8 @@ The following tools and frameworks were used in the construction of this applica
   <img src="https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white" />
 </p>
 
+<br>
+
 ## How to run
 1. Create a root project called Overcome
 ```bash
@@ -85,4 +89,586 @@ docker-compose up --build
 ```bash
 sudo /etc/init.d/apache2 stop
 ```
+<br>
 
+## API Documentation
+### POST **/users/sign-up**
+Body:
+```json
+{
+  "name": "Rodrigo",
+  "email": "rodrigocortibarros@gmail.com",
+  "password": "top_secret"
+}
+```
+Response:
+- Invalid Body
+```json
+"status": 400
+```
+- Email is already registered
+```json
+"status": 409
+```
+- Account is created
+```json
+"status": 201
+```
+<br>
+
+### POST **/users/sign-in**
+Body:
+```json
+{
+  "email": "rodrigocortibarros@gmail.com",
+  "password": "top_secret"
+}
+```
+Response:
+- Invalid Body
+```json
+"status": 400
+```
+- Email and password do not match
+```json
+"status": 401
+```
+- User is logged in
+```json
+"status": 200
+```
+Response Body:
+```json
+{
+  "id": 1,
+  "name": "Rodrigo",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY3NTUyNzU3NX0.dZG81oT6Ve0qDOtLyG-U_IR35W06gTyKDlYwkscYa_M"
+}
+```
+<br>
+
+### **All routes below are authenticated routes and will use an authorization header as shown below**
+Instead of "token", use your own token acquired through the **/users/sign-in** route
+```json
+{
+  "headers": {
+    "Authorization": "Bearer token"
+  }
+}
+```
+#### If the user is not authorized, he will receive the following response
+```json
+"status": 401
+```
+<br>
+
+### GET **/exercises/**
+Response:
+```json
+"status": 200
+```
+Response Body:
+```json
+[
+  {
+    "id": 1,
+    "name": "Bench Press",
+    "createdAt": "2023-02-04T16:17:54.910Z",
+    "updatedAt": "2023-02-04T16:17:54.910Z"
+  }
+]
+```
+<br>
+
+### GET **/exercises/:searchParam**
+| Parameter  | Type     | Description                        |
+| :---------- | :--------- | :---------------------------------- |
+| `searchParam` | `string` | Will be used to find matching exercises|
+
+<br>
+
+- If no exercises match the searchParam:
+```json
+"status": 404
+```
+- If there is at least one matching exercise:
+
+Response:
+```json
+"status": 200
+```
+Response Body:
+```json
+[
+  {
+    "id": 1,
+    "name": "Bench Press",
+    "createdAt": "2023-02-04T16:17:54.910Z",
+    "updatedAt": "2023-02-04T16:17:54.910Z"
+  }
+]
+```
+<br>
+
+### POST **/exercises**
+Body:
+```json
+{
+  "name": "Bench Press",
+}
+```
+- Invalid Body
+```json
+"status": 400
+```
+- Exercise already exists
+```json
+"status": 409
+```
+- Exercise is created
+```json
+"status": 201,
+```
+Response Body:
+```json
+{
+  "id": 1,
+  "name": "Bench Press",
+  "createdAt": "2023-02-04T16:17:54.910Z",
+  "updatedAt": "2023-02-04T16:17:54.910Z"
+}
+```
+<br>
+
+### GET **/objectives**
+Response:
+- User has no objective registered
+```json
+"status": 404
+```
+- User has an objective registered
+```json
+"status": 200
+```
+Response Body:
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "title": "Become stronger",
+  "currentWeight": 60.5,
+  "goalWeight": 65,
+  "createdAt": "2023-02-04T16:17:54.910Z",
+  "updatedAt": "2023-02-04T16:17:54.910Z"
+}
+```
+<br>
+
+### POST **/objectives**
+Body:
+```json
+{
+  "title": "Become stronger",
+  "currentWeight": 60.5,
+  "goalWeight": 65,
+}
+```
+Response:
+- Invalid Body
+```json
+"status": 400
+```
+- User already has an objective registered
+```json
+"status": 403
+```
+- Objective is registered
+```json
+"status": 201
+```
+Response Body:
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "title": "Become stronger",
+  "currentWeight": 60.5,
+  "goalWeight": 65,
+  "createdAt": "2023-02-04T16:17:54.910Z",
+  "updatedAt": "2023-02-04T16:17:54.910Z"
+}
+```
+<br>
+
+### PUT **/objectives**
+Body:
+```json
+{
+  "title": "Become stronger",
+  "currentWeight": 60.5,
+  "goalWeight": 65,
+}
+```
+Response:
+- Invalid Body
+```json
+"status": 400
+```
+- User does not have an objective registered yet
+```json
+"status": 404
+```
+- Objective is updated
+```json
+"status": 200
+```
+Response Body:
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "title": "Become stronger",
+  "currentWeight": 60.5,
+  "goalWeight": 65,
+  "createdAt": "2023-02-04T16:17:54.910Z",
+  "updatedAt": "2023-02-04T16:17:54.910Z"
+}
+```
+<br>
+
+### GET **/sheets**
+Response:
+```json
+"status": 200
+```
+Response Body:
+```json
+[
+  {
+    "id": 1,
+    "title": "Chest Day",
+    "userId": 1,
+    "createdAt": "2023-02-04T16:17:54.910Z",
+    "updatedAt": "2023-02-04T16:17:54.910Z",
+    "SheetExercise": [
+      {
+        "weight": 42.5,
+        "reps": 8,
+        "sets": 4,
+        "Exercise": {
+          "id": 1,
+          "name": "Bench Press",
+        }
+      }
+    ]
+  }
+]
+```
+<br>
+
+### POST **/sheets**
+Body:
+```json
+{
+  "title": "Chest Day"
+}
+```
+Reponse:
+- Invalid Body
+```json
+"status": 400
+```
+- Sheet is created
+```json
+"status": 201
+```
+Response Body:
+```json
+{
+  "id": 1,
+  "title": "Chest Day",
+  "userId": 1,
+  "createdAt": "2023-02-04T16:17:54.910Z",
+  "updatedAt": "2023-02-04T16:17:54.910Z"
+}
+```
+<br>
+
+### PUT **/sheets/:sheetId**
+| Parameter  | Type     | Description                        |
+| :---------- | :--------- | :---------------------------------- |
+| `sheetId` | `number` | The id of the sheet you want to add exercises|
+
+<br>
+
+Body:
+```json
+{
+  "exerciseBody": [
+    {
+      "exerciseId": 1,
+      "weight": 42.5,
+      "reps": 8,
+      "sets": 4,
+    }
+  ]
+}
+```
+
+Reponse:
+- Sheet does not exist:
+```json
+"status": 404
+```
+- Sheet is not owned by the user
+```json
+"status": 403
+```
+- Invalid Body
+```json
+"status": 400
+```
+- Sheet is updated with exercises
+```json
+"status": 200
+```
+Response Body:
+```json
+{
+  "count": 1
+}
+```
+<br>
+
+### DELETE **/sheets/:sheetId**
+| Parameter  | Type     | Description                        |
+| :---------- | :--------- | :---------------------------------- |
+| `sheetId` | `number` | The id of the sheet you want to delete|
+
+<br>
+
+Response:
+- Invalid Parameter
+```json
+"status": 400
+```
+- Sheet does not exist:
+```json
+"status": 404
+```
+- Sheet is not owned by the user
+```json
+"status": 403
+```
+- Sheet and its exercises are deleted
+```json
+"status": 204
+```
+<br>
+
+### GET **/workouts**
+Response:
+```json
+"status": 200
+```
+Response Body:
+```json
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "sheetId": null,
+    "cardio": "CYCLING",
+    "createdAt": "2023-02-04T16:17:54.910Z",
+    "updatedAt": "2023-02-04T16:17:54.910Z",
+    "Sheet": null
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "sheetId": 1,
+    "cardio": null,
+    "createdAt": "2023-02-04T16:17:54.910Z",
+    "updatedAt": "2023-02-04T16:17:54.910Z",
+    "Sheet": {
+      "id": 1,
+      "title": "Chest Day",
+      "userId": 1,
+      "createdAt": "2023-02-04T16:17:54.910Z",
+      "updatedAt": "2023-02-04T16:17:54.910Z"
+    }
+  }
+]
+```
+<br>
+
+### POST **/workouts**
+Body:
+```json
+{
+  "sheetId": 1
+}
+```
+or
+```json
+{
+  "cardio": "CYCLING"
+}
+```
+cardio has only three possible values:
+```json
+{
+  "CYCLING": "CYCLING",
+  "RUNNING": "RUNNING",
+  "SWIMMING": "SWIMMING"
+}
+```
+
+Response:
+- Invalid Body (or includes both or neither body params)
+```json
+"status": 400
+```
+- Sheet does not exist
+```json
+"status": 404
+```
+- Sheet is not owned by the user
+```json
+"status": 403
+```
+- Workout is registered
+```json
+"status": 201
+```
+Response Body:
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "sheetId": null,
+  "cardio": "CYCLING",
+  "createdAt": "2023-02-04T16:17:54.910Z",
+  "updatedAt": "2023-02-04T16:17:54.910Z"
+}
+```
+<br>
+
+### GET **/journals**
+Response:
+```json
+"status": 200
+```
+Response Body:
+```json
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "text": "Lorem ipsum dolor",
+    "createdAt": "2023-02-04T16:17:54.910Z",
+    "updatedAt": "2023-02-04T16:17:54.910Z"
+  }
+]
+```
+<br>
+
+### POST **/journals**
+Body:
+```json
+{
+  "text": "Lorem ipsum dolor"
+}
+```
+
+Response:
+- Invalid Body
+```json
+"status": 400
+```
+- Journal is created
+```json
+"status": 201
+```
+Response Body:
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "text": "Lorem ipsum dolor",
+  "createdAt": "2023-02-04T16:17:54.910Z",
+  "updatedAt": "2023-02-04T16:17:54.910Z"
+}
+```
+<br>
+
+### PUT **/journals/:journalId**
+| Parameter  | Type     | Description                        |
+| :---------- | :--------- | :---------------------------------- |
+| `journalId` | `number` | The id of the journal you want to update|
+<br>
+
+Body:
+```json
+{
+  "text": "Lorem ipsum"
+}
+```
+
+Response:
+- Invalid Parameter
+```json
+"status": 400
+```
+- Invalid Body
+```json
+"status": 400
+```
+- Journal does not exist
+```json
+"status": 404
+```
+- Journal is not owned by the user
+```json
+"status": 403
+```
+- Journal is updated
+```json
+"status": 200
+```
+Response Body:
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "text": "Lorem ipsum",
+  "createdAt": "2023-02-04T16:17:54.910Z",
+  "updatedAt": "2023-02-04T16:17:54.910Z"
+}
+```
+
+<br>
+
+### DELETE **/journals/:journalId**
+| Parameter  | Type     | Description                        |
+| :---------- | :--------- | :---------------------------------- |
+| `journalId` | `number` | The id of the journal you want to delete|
+<br>
+
+Response:
+- Invalid Parameter
+```json
+"status": 400
+```
+- Journal does not exist
+```json
+"status": 404
+```
+- Journal is not owned by the user
+```json
+"status": 403
+```
+- Journal is successfully deleted
+```json
+"status": 204
+```
